@@ -118,11 +118,14 @@ class ArrayFilterFunction : public FilterFunctionBase {
     auto& decodedArray = *arrayDecoder.get();
 
     auto flatArray = flattenArray(rows, args[0], decodedArray);
+    auto indexArray = AlignedBuffer::allocate<int32_t >(flatArray->size(), flatArray->pool(), 0);
+    auto* rawIndexArray = indexArray->asMutable<int32_t>();
 
     VectorPtr elements = flatArray->elements();
     BufferPtr resultSizes;
     BufferPtr resultOffsets;
     BufferPtr selectedIndices;
+//    auto lambdaArgsNum = args[1]
     auto numSelected = doApply(
         rows,
         flatArray,
@@ -153,13 +156,22 @@ class ArrayFilterFunction : public FilterFunctionBase {
   }
 
   static std::vector<std::shared_ptr<exec::FunctionSignature>> signatures() {
-    // array(T), function(T, boolean) -> array(T)
-    return {exec::FunctionSignatureBuilder()
-                .typeVariable("T")
-                .returnType("array(T)")
-                .argumentType("array(T)")
-                .argumentType("function(T,boolean)")
-                .build()};
+    return {
+        // array(T), function(T, boolean) -> array(T)
+        exec::FunctionSignatureBuilder()
+            .typeVariable("T")
+            .returnType("array(T)")
+            .argumentType("array(T)")
+            .argumentType("function(T,boolean)")
+            .build(),
+        // array(T), function(T, integer, boolean) -> array(T)
+        exec::FunctionSignatureBuilder()
+            .typeVariable("T")
+            .returnType("array(T)")
+            .argumentType("array(T)")
+            .argumentType("function(T, integer, boolean)")
+            .build(),
+    };
   }
 };
 

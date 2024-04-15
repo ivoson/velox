@@ -63,7 +63,7 @@ TEST_F(ArrayFilterTest, filter) {
       BatchMaker::createBatch(rowType, 1'000, *execCtx_.pool()));
 
   auto result =
-      evaluate<BaseVector>("filter(array_val, x -> (x > long_val))", data);
+      evaluate<BaseVector>("filter(array_val, (x, i) -> (x > i))", data);
   auto* cutoff = data->childAt(0)->as<SimpleVector<int64_t>>();
   checkArrayFilter<SimpleVector<int64_t>>(
       data->childAt(1).get(),
