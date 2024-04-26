@@ -25,6 +25,7 @@
 #include "velox/functions/prestosql/ArrayFunctions.h"
 #include "velox/functions/prestosql/DateTimeFunctions.h"
 #include "velox/functions/prestosql/StringFunctions.h"
+#include "velox/functions/sparksql/ArrayFlattenFunction.h"
 #include "velox/functions/sparksql/ArrayMinMaxFunction.h"
 #include "velox/functions/sparksql/ArraySort.h"
 #include "velox/functions/sparksql/ArrayUnionFunction.h"
@@ -427,6 +428,11 @@ void registerFunctions(const std::string& prefix) {
   registerArrayUnionFunctions<Date>(prefix);
   registerArrayUnionFunctions<Timestamp>(prefix);
   registerArrayUnionFunctions<Generic<T1>>(prefix);
+
+  registerFunction<
+      ArrayFlattenFunction,
+      Array<Generic<T1>>,
+      Array<Array<Generic<T1>>>>({prefix + "flatten"});
 }
 
 } // namespace sparksql
